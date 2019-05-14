@@ -1,10 +1,10 @@
 {
   "name": "typeorm-seeder",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A simple extension library for typeorm to perform seeding",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "bin": "dist/cli.js",
+  "bin": "bin/cli",
   "scripts": {
     "fmt": "$(npm bin)/prettier",
     "build": "$(npm bin)/tsc",
@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/YoshiyukiKato/typeorm-seeder#readme",
   "dependencies": {
-    "commander": "^2.20.0"
+    "commander": "^2.20.0",
+    "ts-node": "^8.1.0"
   },
   "peerDependencies": {
     "typeorm": "^0.2.16"
@@ -37,7 +38,6 @@
     "power-assert": "^1.6.1",
     "prettier": "^1.17.0",
     "sqlite3": "^4.0.6",
-    "ts-node": "^8.1.0",
     "typeorm": "^0.2.16",
     "typescript": "^3.4.4"
   }

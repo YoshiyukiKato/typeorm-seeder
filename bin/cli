@@ -1,0 +1,2 @@
+BIN_PATH=$(cd $(dirname $0); pwd)
+$(npm bin)/ts-node $BIN_PATH/../src/cli.ts $@
