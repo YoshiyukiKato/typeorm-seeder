@@ -1,5 +1,10 @@
 import path from "path";
-import { createConnection, ConnectionOptions, Connection } from "typeorm";
+import {
+  createConnection,
+  ConnectionOptions,
+  Connection,
+  Repository,
+} from "typeorm";
 import glob from "fast-glob";
 
 export interface ISeed {
@@ -31,10 +36,30 @@ export class Seeder {
   ): Promise<void> {
     const repository = this.connection.getRepository(Entity);
     for (const seed of seeds) {
-      console.log("seed", seed);
-      const entity = repository.create(seed);
-      await (clear ? repository.remove(entity) : repository.save(entity));
+      await (clear
+        ? this.removeSeed(repository, seed)
+        : this.saveSeed(repository, seed));
     }
+  }
+
+  async saveSeed<Entity>(
+    this: Seeder,
+    repository: Repository<Entity>,
+    seed: any
+  ) {
+    const entity = repository.create(seed);
+    await repository.save(entity);
+    console.info("Saved seed: ", seed);
+  }
+
+  async removeSeed<Entity>(
+    this: Seeder,
+    repository: Repository<Entity>,
+    seed: any
+  ) {
+    const entity = repository.create(seed);
+    await repository.remove(entity);
+    console.info("Removed seed: ", seed);
   }
 
   public async loadSeed(this: Seeder, seedData: ISeed): Promise<void> {
