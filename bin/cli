@@ -1,2 +1,2 @@
-BIN_PATH=$(cd $(dirname $0); pwd)
-$(npm bin)/ts-node $BIN_PATH/../typeorm-seeder/src/cli.ts $@
+NODE_MODULES=$(cd $(dirname $0); pwd)/..
+NODE_MODULES/.bin/ts-node NODE_MODULES/typeorm-seeder/src/cli.ts $@
