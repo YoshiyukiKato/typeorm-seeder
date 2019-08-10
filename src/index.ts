@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import glob from "fast-glob";
 import { RelationMetadataArgs } from "typeorm/metadata-args/RelationMetadataArgs";
+import { JoinColumnMetadataArgs } from "typeorm/metadata-args/JoinColumnMetadataArgs";
 
 export interface ISeed {
   Entity: { new (): any };
@@ -15,6 +16,7 @@ export interface ISeed {
 }
 
 type TEntityRelations = { [key: string]: RelationMetadataArgs[] };
+type TEntityJoinColumns = { [key: string]: JoinColumnMetadataArgs[] };
 
 export class Seeder {
   private connection: Connection;
@@ -41,28 +43,27 @@ export class Seeder {
     clear: boolean = false
   ): Promise<any[]> {
     const entityRelations = getMetadataArgsStorage()
-      .relations.filter(({ target, relationType }) => {
-        return target === Entity && relationType.match(/-to-many$/);
-      })
+      .relations
+      .filter((relation) => relation.target === Entity)
       .reduce((acc: TEntityRelations, relation: RelationMetadataArgs) => {
         acc[relation["propertyName"]] = acc[relation["propertyName"]] || [];
         acc[relation["propertyName"]].push(relation);
         return acc;
       }, {});
 
-    const relAppliedSeeds = await this.applyRelactions(
+    const relAppliedSeeds = await this.applyRelations(
       seeds,
       entityRelations,
       clear
     );
     const repository = this.connection.getRepository(Entity);
-
+ 
     return await (clear
       ? this.removeSeeds(repository, relAppliedSeeds)
       : this.saveSeeds(repository, relAppliedSeeds));
   }
 
-  public async applyRelactions(
+  public async applyRelations(
     seeds: any[],
     entityRelations: TEntityRelations,
     clear: boolean
@@ -83,13 +84,18 @@ export class Seeder {
               clear
             );
           } else {
-            relAppliedSeed[key] = (await this.applySeeds(
-              <ISeed>{
-                Entity: ChildEntity,
-                seeds: [val],
-              },
-              clear
-            ))[0];
+            try {
+              const relSeed = (await this.applySeeds(
+                <ISeed>{
+                  Entity: ChildEntity,
+                  seeds: [val],
+                },
+                clear
+              ))[0];
+              relAppliedSeed[key] = relSeed
+            }catch(err){
+              console.error(err);
+            }
           }
         }
       }
@@ -116,7 +122,7 @@ export class Seeder {
   ) {
     const entities = repository.create(seeds);
     await repository.remove(entities);
-    console.info("Removed seed: ", seeds);
+    console.info("Removed seeds: ", seeds);
     return entities;
   }
 
