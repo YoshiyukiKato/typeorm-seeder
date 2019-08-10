@@ -1,6 +1,6 @@
 {
   "name": "typeorm-seeder",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A simple extension library for typeorm to perform seeding",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
